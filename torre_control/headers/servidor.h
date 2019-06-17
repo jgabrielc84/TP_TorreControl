@@ -1,4 +1,4 @@
-/*
+/* torre_control
  * servidor.h
  *
  *  Created on: 2 jun. 2019
@@ -13,9 +13,14 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include "../headers/mensaje.h"
 
 
-struct sockaddr_in crearServidor(const char * ip, const char * puerto);
+struct sockaddr_in crearServidor(const char *, const char *);
+
+void enlazarServidor(int *, struct sockaddr_in *);
+
+void recibirMensaje(int *, int *, char *);
 
 
 #endif /* HEADERS_SERVIDOR_H_ */

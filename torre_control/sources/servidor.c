@@ -1,4 +1,4 @@
-/*
+/* torre_control
  * servidor.c
  *
  *  Created on: 2 jun. 2019
@@ -9,12 +9,30 @@
 
 
 struct sockaddr_in crearServidor(const char * ip, const char * puerto){
-	struct sockaddr_in servidor;
+	struct sockaddr_in direccionServidor;
 
-	servidor.sin_family = AF_INET;
-	servidor.sin_addr.s_addr = inet_addr(ip);
-	servidor.sin_port = htons(atoi(puerto));
+	direccionServidor.sin_family = AF_INET;
+	direccionServidor.sin_addr.s_addr = inet_addr(ip);
+	direccionServidor.sin_port = htons(atoi(puerto));
 
-	return servidor;
+	return direccionServidor;
 }
 
+void enlazarServidor(int * servidor, struct sockaddr_in * direccionServidor){
+	if(bind(*servidor, (void *) direccionServidor, sizeof(*direccionServidor)) != 0){ //asocia el socket creado con la direccion del servidor creado
+		perror("Error al enlazar el servidor.\n");
+		exit(EXIT_FAILURE);
+	}
+}
+
+void recibirMensaje(int * bytesRecibidos, int * cliente, char * msjCliente){
+	*bytesRecibidos = 0;
+
+	while(*bytesRecibidos == 0){
+		*bytesRecibidos = recv(*cliente, msjCliente, sizeof(char)*LONG_MSJ_CLIE, 0);
+
+		if(*bytesRecibidos <= 0){
+			printf("Error al recibir mensaje.\n");
+		}
+	}
+}
