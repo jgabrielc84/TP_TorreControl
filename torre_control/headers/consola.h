@@ -17,14 +17,13 @@
 #include "../headers/servidor.h"
 
 enum MENUOPCION{
-	MENU_SALIR_SISTEMA,
-	MENU_REGISTRAR_AVION,
-	MENU_PEDIR_PISTA,
-	MENU_ESTADO_AVION
+	REGISTRAR_AVION=1,
+	INGRESAR_A_PISTA=2,
+	ESTADO_AVION=3
 };
 
 
-void resolverOpcionMsj(int *);
+void resolverOpcionMsj(int *, ST_AVION *, FILE *, char *);
 
 
 #endif /* HEADERS_CONSOLA_H_ */

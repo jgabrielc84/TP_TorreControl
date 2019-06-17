@@ -22,7 +22,7 @@ void liberaBuffer();
 
 void inicializarMsjCliente(char *);
 
-void formatearMensaje(char *, const ST_AVION *, const int *);
+void formatearMensaje(char *, const ST_AVION *, const char *);
 
 void parsearMensaje(ST_AVION *, int *,const char *);
 

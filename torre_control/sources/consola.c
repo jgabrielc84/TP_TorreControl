@@ -8,15 +8,15 @@
 #include "../headers/consola.h"
 
 
-void resolverOpcionMsj(int * opcion){
+void resolverOpcionMsj(int * opcion,ST_AVION * avion, FILE * ptrArchivoTorreControl, char * msjCliente){
 	switch(*opcion){
-	case MENU_REGISTRAR_AVION:
-		//registrarAvion();
+	case REGISTRAR_AVION:
+		registrarAvion(avion, ptrArchivoTorreControl, msjCliente);
 		break;
-	case MENU_PEDIR_PISTA:
+	case INGRESAR_A_PISTA:
 
 		break;
-	case MENU_ESTADO_AVION:
+	case ESTADO_AVION:
 		//enviaEstadoAvion();
 
 		break;

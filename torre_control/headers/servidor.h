@@ -15,8 +15,10 @@
 #include <sys/socket.h>
 #include "../headers/mensaje.h"
 
+#define LONG_IP_SERV 15+1
 
-struct sockaddr_in crearServidor(const char *, const char *);
+
+struct sockaddr_in crearServidor(const char *, const int *);
 
 void enlazarServidor(int *, struct sockaddr_in *);
 

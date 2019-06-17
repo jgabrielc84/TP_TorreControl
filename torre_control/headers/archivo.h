@@ -10,11 +10,17 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "../headers/mensaje.h"
 
+
+void abrirArchivoTorreControl(FILE * ptrArchivoTorreControl, ST_AVION * avion);
 
 void abrirArchivoConfigServ(FILE *);
 
 void leerIpPuertoDeArchivo(FILE *, char *, int *);
+
+int comprobarExisteAvion(FILE *, ST_AVION *);
+
 
 #endif /* HEADERS_ARCHIVO_H_ */
