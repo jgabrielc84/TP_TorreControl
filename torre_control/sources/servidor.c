@@ -27,6 +27,12 @@ void enlazarServidor(int * servidor, struct sockaddr_in * direccionServidor){
 	}
 }
 
+void enviarMensajeACliente(const int * cliente, const char * msjCliente){
+	printf("*enviarMensajeACliente*\n");
+	printf("Mensaje a enviar: %s\n", msjCliente); // BORRAR
+	send(*cliente, msjCliente, sizeof(char)*(LONG_MSJ_CLIE), 0); //Se envia el mensaje formateado al cliente
+}
+
 void recibirMensaje(int * bytesRecibidos, int * cliente, char * msjCliente){
 	printf("*recibirMensaje*\n");
 	*bytesRecibidos = 0;
@@ -38,4 +44,5 @@ void recibirMensaje(int * bytesRecibidos, int * cliente, char * msjCliente){
 			printf("Error al recibir mensaje.\n");
 		}
 	}
+	printf("Mensaje recibido: %s\n", msjCliente); // BORRAR
 }

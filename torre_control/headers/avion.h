@@ -39,5 +39,7 @@ void inicializarAvion(ST_AVION *);
 
 void registrarAvion(ST_AVION *, FILE *, char *);
 
+void consultarEstadoAvion(ST_AVION *, FILE *, char *);
+
 
 #endif /* HEADERS_AVION_H_ */

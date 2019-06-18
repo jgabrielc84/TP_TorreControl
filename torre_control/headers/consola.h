@@ -23,7 +23,7 @@ enum MENUOPCION{
 };
 
 
-void resolverOpcionMsj(int *, ST_AVION *, FILE *, char *);
+void resolverPedidoClie(int *, ST_AVION *, FILE *, char *, const int *);
 
 
 #endif /* HEADERS_CONSOLA_H_ */

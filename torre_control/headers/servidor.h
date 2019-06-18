@@ -22,6 +22,8 @@ struct sockaddr_in crearServidor(const char *, const int *);
 
 void enlazarServidor(int *, struct sockaddr_in *);
 
+void enviarMensajeACliente(const int *, const char *);
+
 void recibirMensaje(int *, int *, char *);
 
 
