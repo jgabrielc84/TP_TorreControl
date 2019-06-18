@@ -44,13 +44,14 @@ void formatearMensaje(char * msjCliente, const ST_AVION * avion, const char * me
 }
 
 void parsearMensaje(ST_AVION * avion, int * opcion,const char * msjCliente){
+	printf("*parsearMensaje*\n");
 	char * linea = malloc(sizeof(char)*LONG_MSJ_CLIE);
 	strcpy(linea, msjCliente);
 
 	strcpy(avion->identificador, strtok(linea, "|"));
 	strcpy(avion->modelo, strtok(NULL, "|"));
 	avion->combustibleActual = atoi(strtok(NULL, "|"));
-	avion->combustibleMax = atoi(strtok(NULL, "|"));
+	avion->combustibleMaximo = atoi(strtok(NULL, "|"));
 	avion->estado = atoi(strtok(NULL, "|"));
 	*opcion = atoi(strtok(NULL, "\0"));
 }

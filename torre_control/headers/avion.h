@@ -30,7 +30,7 @@ typedef struct{
 	char identificador[LONG_IDENTIFICADOR];
 	char modelo[LONG_MODELO];
 	int combustibleActual;
-	int combustibleMax;
+	int combustibleMaximo;
 	enum AVIONESTADO estado;
 }ST_AVION;
 

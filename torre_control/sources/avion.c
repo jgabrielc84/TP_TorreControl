@@ -15,7 +15,7 @@ void inicializarAvion(ST_AVION * avion){
 	memset(avion->identificador, '\0', LONG_IDENTIFICADOR);
 	avion->estado = AVION_HANGAR;
 	avion->combustibleActual = 0;
-	avion->combustibleMax = 0;
+	avion->combustibleMaximo = 0;
 }
 
 void registrarAvion(ST_AVION * avion, FILE * ptrArchivoTorreControl, char * msjCliente){

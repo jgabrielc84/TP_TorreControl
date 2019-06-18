@@ -43,10 +43,25 @@ int main() {
 	inicializarMsjCliente(msjCliente);
 	inicializarAvion(avion);
 
-	abrirArchivoTorreControl(ptrArchivoTorreControl, avion);
+	//abrirArchivoTorreControl(ptrArchivoTorreControl, avion);
+	//-------------//El archivo se habre en el main porque falla la funcion(no devuelve el puntero creado dentro de la funcion)
+	printf("*abrirArchivoTorreControl*\n");
+	if((ptrArchivoTorreControl = fopen("torreControl.bin", "rb+")) == NULL){
+		printf("Error al abrir archivo torreControl.bin\n");
+		if((ptrArchivoTorreControl = fopen("torreControl.bin", "wb+")) == NULL){
+			printf("Error al crear archivo torreControl.bin\n");
+			exit(EXIT_FAILURE);
+		}else{
+			printf("Archivo torreControl.bin creado correctamente.\n");
+			fwrite(avion, sizeof(ST_AVION), 1, ptrArchivoTorreControl);
+		}
+	}else{
+		printf("Archivo de torreControl.bin abierto correctamente.\n");
+	}
+	//-------------
 
 	//abrirArchivoConfigServ(ptrArchivoConfigServ);
-	//-------------//El archivo se habre en el main porque falla la funcion(no encuentro el error)
+	//-------------//El archivo se habre en el main porque falla la funcion(no devuelve el puntero creado dentro de la funcion)
 	printf("*abrirArchivoConfigServ*\n");
 	if((ptrArchivoConfigServ = fopen("config.txt", "r")) == NULL){
 		printf("Error al abrir archivo\n");
@@ -76,17 +91,37 @@ int main() {
 
 	while(1){ //while(inicio) para que el servidor quede corriendo
 		recibirMensaje(&bytesRecibidos, &cliente, msjCliente);
-		parsearMensaje(avion, &opcion, msjCliente);
-
-		//MensajeCliente: AABCN123|Boeing 767|180000|0|1
 
 		printf("MensajeCliente: %s\n\n", msjCliente); // BORRAR
+
+		parsearMensaje(avion, &opcion, msjCliente);
+
+		printf("Id: %s\n", avion->identificador); // BORRAR
+		printf("Modelo: %s\n", avion->modelo); // BORRAR
+		printf("combAct: %d\n", avion->combustibleActual); // BORRAR
+		printf("combMax: %d\n", avion->combustibleMaximo); // BORRAR
+		printf("estado: %d\n", avion->estado); // BORRAR
+		printf("Opcion: %d\n", opcion); // BORRAR
+
+		//------------------
+		fseek(ptrArchivoTorreControl, 0, SEEK_SET); // BORRAR
+		fread(avion, sizeof(ST_AVION), 1, ptrArchivoTorreControl); // BORRAR
+		printf("Id: %s\n", avion->identificador); // BORRAR
+		printf("Modelo: %s\n", avion->modelo); // BORRAR
+		printf("combAct: %d\n", avion->combustibleActual); // BORRAR
+		printf("combMax: %d\n", avion->combustibleMaximo); // BORRAR
+		printf("estado: %d\n", avion->estado); // BORRAR
+		printf("Opcion: %d\n", opcion); // BORRAR
+
+
 		printf("wait windows 6\n\n"); // BORRAR
 
 		resolverOpcionMsj(&opcion, avion, ptrArchivoTorreControl, msjCliente);
 
 	}//FIN while(inicio)
 
+	fclose(ptrArchivoConfigServ);
+	fclose(ptrArchivoTorreControl);
 	free(ptrArchivoConfigServ);
 	free(ptrArchivoTorreControl);
 	free(ipServidor);

@@ -28,6 +28,7 @@ void enlazarServidor(int * servidor, struct sockaddr_in * direccionServidor){
 }
 
 void recibirMensaje(int * bytesRecibidos, int * cliente, char * msjCliente){
+	printf("*recibirMensaje*\n");
 	*bytesRecibidos = 0;
 
 	while(*bytesRecibidos == 0){
