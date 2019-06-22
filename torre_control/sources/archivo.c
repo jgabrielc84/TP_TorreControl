@@ -31,15 +31,19 @@ void abrirArchivoTorreControl(FILE * ptrArchivoTorreControl, ST_AVION * avion){
 	}
 }
 
-void abrirArchivoConfigServ(FILE * ptrArchivo){
-	printf("*abrirArchivoConfigServ*\n");
+FILE * abrirArchivo(const char * nombreArchivo, const char * modoApertura){
+	printf("*abrirArchivo %s*\n", nombreArchivo);
 
-	if((ptrArchivo = fopen("config.txt", "r")) == NULL){
-		printf("Error al abrir archivo config.txt\n");
+	FILE * ptrArchivo = NULL;
+
+	if((ptrArchivo = fopen(nombreArchivo, modoApertura)) == NULL){
+		printf("Error al abrir archivo %s\n", nombreArchivo);
 		exit(EXIT_FAILURE);
 	}else{
-		printf("Archivo de configuracion abierto correctamente.\n\n");
+		printf("Archivo %s abierto correctamente.\n\n", nombreArchivo);
 	}
+
+	return ptrArchivo;
 }
 
 void leerIpPuertoDeArchivo(FILE * ptrArchivo, char * ip, int * puerto){

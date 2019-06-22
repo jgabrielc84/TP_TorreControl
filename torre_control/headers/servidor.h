@@ -11,11 +11,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h> //sleep
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include "../headers/mensaje.h"
 
 #define LONG_IP_SERV 15+1
+#define CANT_MAX_CLIE 10
+//#define NUMEROCLIENTE 10
 
 
 struct sockaddr_in crearServidor(const char *, const int *);
@@ -24,7 +27,7 @@ void enlazarServidor(int *, struct sockaddr_in *);
 
 void enviarMensajeACliente(const int *, const char *);
 
-void recibirMensaje(int *, int *, char *);
+int recibirMensaje(/*int *,*/ int *, char *);
 
 
 #endif /* HEADERS_SERVIDOR_H_ */

@@ -34,12 +34,28 @@ typedef struct{
 	enum AVIONESTADO estado;
 }ST_AVION;
 
+typedef struct nodo{
+	ST_AVION avion;
+	struct nodo *siguiente;
+}ST_NODO, *PTR_NODO;
+
+typedef struct{
+	ST_NODO * frente;
+	ST_NODO * fin;
+}ST_COLA;
+
 
 void inicializarAvion(ST_AVION *);
 
 void registrarAvion(ST_AVION *, FILE *, char *);
 
 void consultarEstadoAvion(ST_AVION *, FILE *, char *);
+
+void crearCola(ST_COLA *);
+
+void crearLista(PTR_NODO *);
+
+ST_NODO * insertInFront(PTR_NODO *, ST_NODO *);
 
 
 #endif /* HEADERS_AVION_H_ */

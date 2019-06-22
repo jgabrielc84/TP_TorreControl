@@ -58,3 +58,25 @@ void consultarEstadoAvion(ST_AVION * avion, FILE * ptrArchivoTorreControl, char 
 		formatearMensaje(msjCliente, avion, "El avion solicitado no se encuentra en torre de control\n\n");
 	}
 }
+
+
+void crearCola(ST_COLA * cola){
+	cola->frente = NULL;
+	cola->fin = NULL;
+}
+
+void crearLista(PTR_NODO * lista){
+	*lista = NULL;
+}
+
+/*ST_NODO * insertInFront(PTR_NODO * lista, ST_NODO * dato){
+	// creación del nodo
+	ST_NODO *nodo = malloc(sizeof(ST_NODO));
+	//nodo->avion = avion;  // copiar avion
+	nodo->siguiente = NULL;
+
+	//insertamos el nuevo nodo en la lista
+	nodo->siguiente = *list;
+	*list = nodo;
+	return nodo;
+}*/

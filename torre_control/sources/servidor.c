@@ -33,16 +33,19 @@ void enviarMensajeACliente(const int * cliente, const char * msjCliente){
 	send(*cliente, msjCliente, sizeof(char)*(LONG_MSJ_CLIE), 0); //Se envia el mensaje formateado al cliente
 }
 
-void recibirMensaje(int * bytesRecibidos, int * cliente, char * msjCliente){
+int recibirMensaje(/*int * bytesRecibidos,*/ int * cliente, char * msjCliente){
 	printf("*recibirMensaje*\n");
-	*bytesRecibidos = 0;
+	int bytesRecibidos = 0;
 
-	while(*bytesRecibidos == 0){
-		*bytesRecibidos = recv(*cliente, msjCliente, sizeof(char)*LONG_MSJ_CLIE, 0);
+	while(bytesRecibidos == 0){
+		bytesRecibidos = recv(*cliente, msjCliente, sizeof(char)*LONG_MSJ_CLIE, 0);
 
-		if(*bytesRecibidos <= 0){
+		if(bytesRecibidos <= 0){
 			printf("Error al recibir mensaje.\n");
+			sleep(3);
 		}
 	}
 	printf("Mensaje recibido: %s\n", msjCliente); // BORRAR
+
+	return bytesRecibidos;
 }
