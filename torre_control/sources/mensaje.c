@@ -8,7 +8,7 @@
 #include "../headers/mensaje.h"
 
 
-void liberaBuffer(){
+void liberarBuffer(){
 	printf("*liberaBuffer*\n");
 
 	char c;

@@ -38,7 +38,14 @@ FILE * abrirArchivo(const char * nombreArchivo, const char * modoApertura){
 
 	if((ptrArchivo = fopen(nombreArchivo, modoApertura)) == NULL){
 		printf("Error al abrir archivo %s\n", nombreArchivo);
-		exit(EXIT_FAILURE);
+		if ((strcmp(nombreArchivo, "torreControl.bin")) == 0){
+			if((ptrArchivo = fopen(nombreArchivo, "wb+")) == NULL){
+				printf("Error al abrir archivo %s\n", nombreArchivo);
+				exit(EXIT_FAILURE);
+			}else{
+				printf("Archivo %s creado correctamente.\n\n", nombreArchivo);
+			}
+		}
 	}else{
 		printf("Archivo %s abierto correctamente.\n\n", nombreArchivo);
 	}
@@ -65,7 +72,7 @@ int comprobarExisteAvion(FILE * ptrArchivoTorreControl, ST_AVION * avion){
 	printf("*comprobarExisteAvion*\n");
 
 	long int posicionInicialPtr = 0;
-	int encontrado = 0;
+	int encontrado = FALSE;
 	ST_AVION * avionArchivo = malloc(sizeof(ST_AVION));
 	inicializarAvion(avionArchivo);
 
@@ -73,14 +80,11 @@ int comprobarExisteAvion(FILE * ptrArchivoTorreControl, ST_AVION * avion){
 	fseek(ptrArchivoTorreControl, 0, SEEK_SET);
 	fread(avionArchivo, sizeof(ST_AVION), 1, ptrArchivoTorreControl);
 
-	while((!feof(ptrArchivoTorreControl)) && (strcmp(avionArchivo->identificador, avion->identificador) != 0)){
+	while((!feof(ptrArchivoTorreControl)) && encontrado == FALSE){  //(strcmp(avionArchivo->identificador, avion->identificador) != 0)){
+		if(strcmp(avionArchivo->identificador, avion->identificador) == 0){
+			encontrado = TRUE;
+		}
 		fread(avionArchivo, sizeof(ST_AVION), 1, ptrArchivoTorreControl);
-	}
-
-	if(strcmp(avionArchivo->identificador, avion->identificador) == 0){
-		encontrado = 1; //true
-	}else{
-		encontrado = 0; //false
 	}
 
 	fseek(ptrArchivoTorreControl, posicionInicialPtr, SEEK_SET); // vuelve a poner el puntero en donde lo encontro

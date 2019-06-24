@@ -18,7 +18,7 @@
 #define LONG_ESTADOAVION 1+1
 #define LONG_OPCIONAVION 1+1
 
-void liberaBuffer();
+void liberarBuffer();
 
 void inicializarMsjCliente(char *);
 

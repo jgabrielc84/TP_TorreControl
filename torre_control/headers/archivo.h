@@ -12,6 +12,9 @@
 #include <stdlib.h>
 #include "../headers/mensaje.h"
 
+#define TRUE 1
+#define FALSE 0
+
 
 FILE * abrirArchivo(const char *, const char *);
 
