@@ -23,7 +23,9 @@ enum MENUOPCION{
 };
 
 
-void resolverPedidoClie(int *, ST_AVION *, FILE *, char *, const int *);
+void resolverPedidoCliente(int *, ST_AVION *, char *, const int *, PTR_NODOAVION *);
+
+void resolverSelect();
 
 
 #endif /* HEADERS_CONSOLA_H_ */

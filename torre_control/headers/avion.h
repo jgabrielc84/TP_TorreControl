@@ -11,9 +11,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <pthread.h>
 
 #define LONG_IDENTIFICADOR 8+1
 #define LONG_MODELO 20+1
+#define COMBUSTIBLE_ESTADO_CRITICO 10000
 
 
 enum AVIONESTADO{
@@ -37,25 +40,55 @@ typedef struct{
 typedef struct nodo{
 	ST_AVION avion;
 	struct nodo *siguiente;
-}ST_NODO, *PTR_NODO;
+}ST_NODOAVION, *PTR_NODOAVION;
 
 typedef struct{
-	ST_NODO * frente;
-	ST_NODO * fin;
+	ST_NODOAVION * frente;
+	ST_NODOAVION * fin;
 }ST_COLA;
+
+typedef struct{
+	PTR_NODOAVION * ptrListaAviones;
+	PTR_NODOAVION * ptrListaAterrizaje;
+	ST_COLA * ptrColaDespegue;
+}ST_PTRLISTASCOLAS;
 
 
 void inicializarAvion(ST_AVION *);
 
-void registrarAvion(ST_AVION *, FILE *, char *);
+void registrarAvion(ST_AVION *, PTR_NODOAVION *, char *);
 
-void consultarEstadoAvion(ST_AVION *, FILE *, char *);
+void ingresarAPista(ST_AVION *, PTR_NODOAVION *, char *);
 
-void crearCola(ST_COLA *);
+void consultarEstadoAvion(ST_AVION *, PTR_NODOAVION *, char *);
 
-void crearLista(PTR_NODO *);
+void * gastarCombustible(PTR_NODOAVION *);
 
-ST_NODO * insertInFront(PTR_NODO *, ST_NODO *);
+void * manejarEstados(PTR_NODOAVION *, PTR_NODOAVION *, ST_COLA *);
+
+void * administrarPista(ST_PTRLISTASCOLAS *);
+
+void gastarcombustiblePRUEBA(PTR_NODOAVION *);
+
+void manejarEstadosPRUEBA(PTR_NODOAVION *,PTR_NODOAVION *, ST_COLA *);
+
+void administrarPistaPRUEBA();
+
+void colaCrear(ST_COLA *);
+
+void colaAgregar(ST_COLA *, ST_AVION *);
+
+ST_AVION * colaRemover(ST_COLA *);
+
+void listaCrear(PTR_NODOAVION *);
+
+ST_NODOAVION * listaInsertarEnFrente(PTR_NODOAVION *, ST_AVION *);
+
+ST_NODOAVION * listaInsertarAlFinal(PTR_NODOAVION *, ST_AVION *);
+
+ST_NODOAVION * listaBuscarAvion(PTR_NODOAVION *, ST_AVION *);
+
+ST_AVION * listaBorrarPrimero(PTR_NODOAVION *);
 
 
 #endif /* HEADERS_AVION_H_ */

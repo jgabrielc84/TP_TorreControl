@@ -13,7 +13,7 @@
 #include <string.h>
 #include "../headers/avion.h"
 
-#define LONG_MSJ_CLIE 100+1
+#define LONG_MSJ_CLIE 120+1
 #define LONG_COMBUSTIBLEAVION 10+1
 #define LONG_ESTADOAVION 1+1
 #define LONG_OPCIONAVION 1+1
