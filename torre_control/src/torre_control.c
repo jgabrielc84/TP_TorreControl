@@ -50,10 +50,10 @@ int main() {
 	PTR_NODOAVION listaAviones;
 	PTR_NODOAVION listaAterrizaje;
 	ST_COLA colaDespegue;
-	ST_PTRLISTASCOLAS * ptrListasColas = NULL;
-	pthread_t hiloGastarCombustible;
-	pthread_t hiloAdministrarPista;
-	pthread_t hiloManejarEstados;
+//	ST_PTRLISTASCOLAS ptrListasColas;
+//	pthread_t hiloGastarCombustible;
+//	pthread_t hiloAdministrarPista;
+//	pthread_t hiloManejarEstados;
 
 	//INICIALIZAR VARIABLES
 	memset(ipServidor, '\0', LONG_IP_SERV);
@@ -62,7 +62,9 @@ int main() {
 	listaCrear(&listaAviones);
 	listaCrear(&listaAterrizaje);
 	colaCrear(&colaDespegue);
-	/*Inicializa los soquets en 0*/
+//	ptrListasColas = malloc(sizeof(ST_PTRLISTASCOLAS));
+
+	/*Inicializa los socketCliente en 0*/
 	for (i = 0; i < CANT_MAX_CLIE; i++){
 		socketCliente[i] = 0;
 	}
@@ -72,6 +74,7 @@ int main() {
 	leerIpPuertoDeArchivo(ptrArchivoConfigServ, ipServidor, &puertoServidor);
 
 	fclose(ptrArchivoConfigServ);
+	free(ptrArchivoConfigServ);
 
 	direccionServidor = crearServidor(ipServidor, &puertoServidor);
 
@@ -89,31 +92,37 @@ int main() {
 	}
 
 //	/*Crea hilo que ejecuta gastarCombustible*/
-//	if(pthread_create(&hiloGastarCombustible, NULL, (void *) gastarCombustible, listaAviones)) {
+//	if(pthread_create(&hiloGastarCombustible, NULL, (void *) gastarCombustible, &listaAviones)) {
 //		printf("Error al crear el hilo.\n");
 //		exit(EXIT_FAILURE);
 //	}
+//
+//	ptrListasColas.ptrListaAviones = listaAviones;
+//	ptrListasColas.ptrListaAterrizaje = listaAterrizaje;
+//	ptrListasColas.ptrColaDespegueFrente = colaDespegue.frente;
+//	ptrListasColas.ptrColaDespegueFin = colaDespegue.fin;
+//	sleep(1);
 //
 //	/*Crea hilo que ejecuta manejarEstados*/
-//	if(pthread_create(&hiloManejarEstados, NULL, (void *) manejarEstados, listaAviones)) {
+//	if(pthread_create(&hiloManejarEstados, NULL, (void *) manejarEstados, &ptrListasColas)) {
 //		printf("Error al crear el hilo.\n");
 //		exit(EXIT_FAILURE);
 //	}
 //
-//	ptrListasColas->ptrListaAviones = &listaAviones;
-//	ptrListasColas->ptrListaAterrizaje = &listaAterrizaje;
-//	ptrListasColas->ptrColaDespegue = &colaDespegue;
+//	sleep(1);
 //
 //	/*Crea hilo que ejecuta administrarPista*/
-//	if(pthread_create(&hiloAdministrarPista, NULL, (void *) administrarPista, ptrListasColas)) {
+//	if(pthread_create(&hiloAdministrarPista, NULL, (void *) administrarPista, &ptrListasColas)) {
 //		printf("Error al crear el hilo.\n");
 //		exit(EXIT_FAILURE);
 //	}
+//
+//	sleep(1);
 
 	while(TRUE){
 		gastarcombustiblePRUEBA(&listaAviones);
 		manejarEstadosPRUEBA(&listaAviones, &listaAterrizaje, &colaDespegue);
-		administrarPistaPRUEBA();
+		administrarPistaPRUEBA(&listaAviones, &listaAterrizaje, &colaDespegue);
 
 //		resolverSelect();
 
@@ -123,8 +132,8 @@ int main() {
 		for (i = 0; i < CANT_MAX_CLIE; i++){
 			FD_SET (socketCliente[i], &descriptorLectura);
 		}
-		//Se setea la cuenta regresiva
-		timeout.tv_sec = 3;
+		//Se setea la cuenta regresiva para usar en el select()
+		timeout.tv_sec = 1;
 		timeout.tv_usec = 0;
 
 		printf("**Espera select**\n");
@@ -138,16 +147,17 @@ int main() {
 				printf("WaitWindows 3.%d\n", i);
 
 				if((bytesRecibidos = recibirMensaje(&(socketCliente[i]), msjCliente)) > 0){
+					// Se ha leido un dato del cliente correctamente. Hacer aquí el tratamiento para ese mensaje. En el ejemplo, se lee y se escribe en pantalla.
 					printf("WaitWindows 4.%d\n", i);
 
-					// Se ha leido un dato del cliente correctamente. Hacer aquí el tratamiento para ese mensaje. En el ejemplo, se lee y se escribe en pantalla.
+					printf("Mensaje recibido: %s\n", msjCliente); // BORRAR
 					parsearMensaje(avion, &opcion, msjCliente);
 
 					printf("Id: %s\n", avion->identificador); // BORRAR
 					printf("Modelo: %s\n", avion->modelo); // BORRAR
-					printf("combAct: %d\n", avion->combustibleActual); // BORRAR
-					printf("combMax: %d\n", avion->combustibleMaximo); // BORRAR
-					printf("estado: %d\n", avion->estado); // BORRAR
+					printf("CombustibleActual: %d\n", avion->combustibleActual); // BORRAR
+					printf("CombustibleMaximo: %d\n", avion->combustibleMaximo); // BORRAR
+					printf("Estado: %d\n", avion->estado); // BORRAR
 					printf("Opcion: %d\n", opcion); // BORRAR
 
 					resolverPedidoCliente(&opcion, avion, msjCliente, &socketCliente[i], &listaAviones);
@@ -210,8 +220,7 @@ int main() {
 		}
 	}//FIN while
 
-	pthread_exit(NULL);
-	free(ptrArchivoConfigServ);
+//	pthread_exit(NULL);
 	free(ipServidor);
 	free(msjCliente);
 	free(avion);

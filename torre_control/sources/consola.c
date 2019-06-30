@@ -10,6 +10,8 @@
 
 void resolverPedidoCliente(int * opcion, ST_AVION * avion, char * msjCliente, const int * idCliente,
 						PTR_NODOAVION * listaAviones){
+	printf("*resolverPedidoCliente*\n");
+
 	switch(*opcion){
 	case REGISTRAR_AVION:
 		registrarAvion(avion, listaAviones, msjCliente);

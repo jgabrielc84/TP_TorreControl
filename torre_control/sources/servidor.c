@@ -45,7 +45,6 @@ int recibirMensaje(/*int * bytesRecibidos,*/ int * cliente, char * msjCliente){
 			sleep(3);
 		}
 	}
-	printf("Mensaje recibido: %s\n", msjCliente); // BORRAR
 
 	return bytesRecibidos;
 }
