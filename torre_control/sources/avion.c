@@ -12,6 +12,11 @@
 #define TRUE 1
 #define FALSE 0
 
+/**
+ * Recibe la estructura del avion y la inicializa en cero,
+ * Setea estado en AVION_HANGAR
+ * @param avion
+ */
 void inicializarAvion(ST_AVION * avion){
 	memset(avion->modelo, '\0', LONG_MODELO);
 	memset(avion->identificador, '\0', LONG_IDENTIFICADOR);
@@ -20,6 +25,15 @@ void inicializarAvion(ST_AVION * avion){
 	avion->combustibleMaximo = 0;
 }
 
+/**
+ * Creacion de un nuevo nodo con los valores recibidos.
+ * Recibe un puntero a una estructura de avion, reserva la memoria para un nodo nuevo
+ * Inicializa el avion pasandole la referencia del avion dentro del nuevo nodo
+ * Con el nodo inicializado pasa a copiar los datos del avion pasado por referencia al avion del nodo
+ *
+ * @param avion
+ * @return puntero a ST_NODOAVION
+ */
 ST_NODOAVION * crearNodo(ST_AVION * avion){
 	printf("*crearNodo*\n");
 
@@ -38,6 +52,13 @@ ST_NODOAVION * crearNodo(ST_AVION * avion){
 	return avionNuevo;
 }
 
+/**
+ * Recibe una lista y un avion el cual inserta al final de la lista.
+ * Utiliza funcion para crear nuevo nodo, crea puntero temporal para encontrar el final de la lista
+ * Chequea si la lista esta vacia o no para insertar el nodo. Devuelve puntero a nuevo nodo.
+ * @param lista, avion
+ * @return puntero a ST_NODOAVION
+ */
 ST_NODOAVION * listaInsertarAlFinal(PTR_NODOAVION * lista, ST_AVION * avion){
 	printf("*listaInsertarAlFinal*\n");
 
@@ -56,7 +77,11 @@ ST_NODOAVION * listaInsertarAlFinal(PTR_NODOAVION * lista, ST_AVION * avion){
 	return avionNuevo;
 }
 
-
+/**
+ * Recibe un puntero a una lista y un puntero a un avion, busca el avion en la lista atraves del id,
+ * devuelve el puntero al nodo en donde está el avion.
+ * @param lista, avion
+ */
 ST_NODOAVION * listaBuscarAvion(PTR_NODOAVION * lista, ST_AVION * avion){
 	printf("*listaBuscarAvion*\n");
 
@@ -177,6 +202,12 @@ ST_AVION listaBorrarAvion(PTR_NODOAVION * lista, ST_AVION * avion){
 	return avionAux;
 }
 
+/**
+ * Recibe un avion para registrar en la lista de aviones a torre de control.
+ *
+ * @param avion, listaAviones, msjCliente
+ *
+ */
 void registrarAvion(ST_AVION * avion, PTR_NODOAVION * listaAviones, char * msjCliente){
 	printf("*registrarAvion*\n");
 
@@ -190,6 +221,12 @@ void registrarAvion(ST_AVION * avion, PTR_NODOAVION * listaAviones, char * msjCl
 	}
 }
 
+/**
+ * Recibe un avion, lo busca en la lista de aviones registrados,
+ * verifica que si el avion quiere despegar o aterrizar depende su estado actual y lo cambia al estado correspondiente
+ * De Listo_Hangar a Listo_Despegar o de En_vuelo a Espera_Aterrizar
+ * @param  avion, listaAviones, msjCliente
+ */
 void ingresarAPista(ST_AVION * avion, PTR_NODOAVION * listaAviones, char * msjCliente){
 	printf("*ingresarAPista*\n");
 
@@ -220,6 +257,11 @@ void ingresarAPista(ST_AVION * avion, PTR_NODOAVION * listaAviones, char * msjCl
 	}
 }
 
+/**
+ * Busca el avion en la lista, si no lo encuentra, se imprime en pantalla la notificacion
+ * Si lo encuentra devuelve todos sus datos y su estado actual.
+ * @param avion, listaAviones, msjCliente
+ */
 void consultarEstadoAvion(ST_AVION * avion, PTR_NODOAVION * listaAviones, char * msjCliente){
 	printf("*consultarEstadoAvion*\n");
 
@@ -232,6 +274,12 @@ void consultarEstadoAvion(ST_AVION * avion, PTR_NODOAVION * listaAviones, char *
 	}
 }
 
+/**
+ * Funcion que recibe la lista de los aviones registrados, chequea si la lista tiene elementos,
+ * chequea cuales estan despegando, en vuelo, esperando aterrizar o aterrizando para contabilizar el gasto de combustible
+ * Los aviones en el hangar cargan combustible, y chequea si hay algun avion que tenga poco combustible y necesite aterrizar.
+ * @param listaAviones
+ */
 void * gastarCombustible(PTR_NODOAVION * listaAviones){
 	printf("*hilo gastarCombustible*\n");
 
@@ -277,6 +325,12 @@ void * gastarCombustible(PTR_NODOAVION * listaAviones){
 	return NULL;
 }
 
+/**
+ * Recibe una estructura con punteros a las listas y colas (aviones registrados,
+ * para aterrizar y para despegar) las pasa a variables.
+ * Va revisando la lista de registrados para ver a que lista o cola deben ser pasados.
+ * @param ptrlistascolas
+ */
 void * manejarEstados(ST_PTRLISTASCOLAS * ptrlistascolas){
 	printf("*hilo manejarEstados*\n");
 
@@ -326,6 +380,10 @@ void * manejarEstados(ST_PTRLISTASCOLAS * ptrlistascolas){
 	return NULL;
 }
 
+/**
+ * Decide que avion utiliza la pista.
+ * @param ptrlistascolas
+ */
 void * administrarPista(ST_PTRLISTASCOLAS * ptrlistascolas){
 	printf("*hilo administrarPista*\n");
 
