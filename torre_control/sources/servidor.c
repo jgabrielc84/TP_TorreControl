@@ -7,7 +7,11 @@
 
 #include "../headers/servidor.h"
 
-
+/**
+ * Setea la direccion y puerto del servidor y lo devuelve.
+ * @param * ip, * puerto
+ * @return struct sockaddr_in
+ */
 struct sockaddr_in crearServidor(const char * ip, const int * puerto){
 	printf("*crearServidor*\n");
 	struct sockaddr_in servidor;
@@ -19,6 +23,10 @@ struct sockaddr_in crearServidor(const char * ip, const int * puerto){
 	return servidor;
 }
 
+/**
+ * Recibe por referencia el socket del servidor y la direccion, para hacer un bind
+ * @param servidor, direccionServidor
+ */
 void enlazarServidor(int * servidor, struct sockaddr_in * direccionServidor){
 	printf("*enlazarServidor*\n");
 	if(bind(*servidor, (void *) direccionServidor, sizeof(*direccionServidor)) != 0){ //asocia el socket creado con la direccion del servidor creado

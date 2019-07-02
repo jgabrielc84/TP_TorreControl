@@ -7,7 +7,9 @@
 
 #include "../headers/mensaje.h"
 
-
+/**
+ *
+ */
 void liberarBuffer(){
 	printf("*liberaBuffer*\n");
 
@@ -15,12 +17,21 @@ void liberarBuffer(){
 	while((c = getchar()) != '\n' && c != EOF);
 }
 
+/**
+ * Limpia el parametro recibido por referencia
+ * @param msjCliente
+ */
 void inicializarMsjCliente(char * msjCliente){
 	printf("*inicializarMsjCliente*\n");
 
 	memset(msjCliente, '\0', LONG_MSJ_CLIE);
 }
 
+/**
+ * Recibe la estructura estructura del avion, datos del combustible, estado, y mensaje,
+ * Concatena un mensaje con toda esa informacion en un solo string pasado por referencia.
+ * @param msjServidor, avion, combustibleActAvion, combustibleMaxAvion, estadoAvion, mensaje
+ */
 void concatenarMsjCliente(char * msjServidor, const ST_AVION * avion,const char * combustibleActAvion, const char * combustibleMaxAvion, const char * estadoAvion, const char * mensaje){
 	printf("*concatenarMsjCliente*\n");
 
@@ -37,6 +48,11 @@ void concatenarMsjCliente(char * msjServidor, const ST_AVION * avion,const char 
 	strcat(msjServidor, mensaje);
 }
 
+/**
+ * Crea punteros de variables de ST_AVION con sus correspondientes reservas de memoria,
+ * Rellena esas variables con los datos de la ST_AVION recibida. Llama a concatenarMsjCliente y libera punteros.
+ * @param msjServidor, avion, mensaje
+ */
 void formatearMensaje(char * msjCliente, const ST_AVION * avion, const char * mensaje){
 	printf("*formatearMensaje*\n");
 
@@ -60,6 +76,11 @@ void formatearMensaje(char * msjCliente, const ST_AVION * avion, const char * me
 	free(estadoAvion);
 }
 
+/**
+ * Recibe el mensaje del Cliente, el cual separa y toma cada dato para ser guardado en
+ * la variable correspondiente dentro de la estructura del avion recibida por referencia
+ * @param avion, opcion, msjCliente
+ */
 void parsearMensaje(ST_AVION * avion, int * opcion,const char * msjCliente){
 	printf("*parsearMensaje*\n");
 

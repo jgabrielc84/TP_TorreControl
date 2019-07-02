@@ -7,7 +7,11 @@
 
 #include "../headers/consola.h"
 
-
+/**
+ * Segun la opcion que le llegue , llama a la funcion que corresponda, ya sea para registrar el avion,
+ * autorizar el uso de la pista o consultar el estado del avion. Luego envia mensaje al Cliente.
+ * @param opcion, avion, msjCliente, idCliente, listaAviones
+ */
 void resolverPedidoCliente(int * opcion, ST_AVION * avion, char * msjCliente, const int * idCliente,
 						PTR_NODOAVION * listaAviones){
 	printf("*resolverPedidoCliente*\n");
