@@ -42,17 +42,16 @@ typedef struct nodo{
 	struct nodo *siguiente;
 }ST_NODOAVION, *PTR_NODOAVION;
 
-typedef struct{
-	ST_NODOAVION * frente;
-	ST_NODOAVION * fin;
-}ST_COLA, *PTR_COLA;
+//typedef struct{
+//	ST_NODOAVION * frente;
+//	ST_NODOAVION * fin;
+//}ST_COLA, *PTR_COLA;
 
 typedef struct{
-	PTR_NODOAVION ptrListaAviones;
-	PTR_NODOAVION ptrListaAterrizaje;
-	PTR_NODOAVION ptrColaDespegueFrente;
-	PTR_NODOAVION ptrColaDespegueFin;
-}ST_PTRLISTASCOLAS,*PTR_PTRLISTASCOLAS;
+	PTR_NODOAVION * ptrListaAviones;
+	PTR_NODOAVION * ptrListaAterrizaje;
+	PTR_NODOAVION * ptrListaDespegue;
+}ST_PTRLISTAS;//,*PTR_PTRLISTASCOLAS;
 
 
 void inicializarAvion(ST_AVION *);
@@ -65,31 +64,17 @@ void consultarEstadoAvion(ST_AVION *, PTR_NODOAVION *, char *);
 
 void * gastarCombustible(PTR_NODOAVION *);
 
-void * manejarEstados(ST_PTRLISTASCOLAS *);
+void * manejarEstados(ST_PTRLISTAS *);
 
-void * administrarPista(ST_PTRLISTASCOLAS *);
+void * administrarPista(ST_PTRLISTAS *);
 
-void gastarcombustiblePRUEBA(PTR_NODOAVION *);
-
-void manejarEstadosPRUEBA(PTR_NODOAVION *, PTR_NODOAVION *, ST_COLA *);
-
-void administrarPistaPRUEBA(PTR_NODOAVION *, PTR_NODOAVION *, ST_COLA *);
-
-void colaCrear(ST_COLA *);
-
-//void colaAgregar(ST_COLA *, ST_AVION *);
+//void gastarcombustiblePRUEBA(PTR_NODOAVION *);
 //
-//ST_AVION * colaRemover(ST_COLA *);
+//void manejarEstadosPRUEBA(PTR_NODOAVION *, PTR_NODOAVION *, PTR_NODOAVION *);
+//
+//void administrarPistaPRUEBA(PTR_NODOAVION *, PTR_NODOAVION *, PTR_NODOAVION *);
 
 void listaCrear(PTR_NODOAVION *);
-
-//ST_NODOAVION * listaInsertarEnFrente(PTR_NODOAVION *, ST_AVION *);
-//
-//ST_NODOAVION * listaInsertarAlFinal(PTR_NODOAVION *, ST_AVION *);
-//
-//ST_NODOAVION * listaBuscarAvion(PTR_NODOAVION *, ST_AVION *);
-//
-//ST_AVION listaBorrarPrimero(PTR_NODOAVION *);
 
 
 #endif /* HEADERS_AVION_H_ */

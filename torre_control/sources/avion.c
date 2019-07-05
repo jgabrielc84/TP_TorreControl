@@ -9,8 +9,6 @@
 #include "../headers/mensaje.h"
 #include "../headers/archivo.h"
 
-#define TRUE 1
-#define FALSE 0
 
 void inicializarAvion(ST_AVION * avion){
 	memset(avion->modelo, '\0', LONG_MODELO);
@@ -60,57 +58,28 @@ ST_NODOAVION * listaInsertarAlFinal(PTR_NODOAVION * lista, ST_AVION * avion){
 ST_NODOAVION * listaBuscarAvion(PTR_NODOAVION * lista, ST_AVION * avion){
 	printf("*listaBuscarAvion*\n");
 
+	printf("*listaBuscarAvion WW1*\n");
+
 	ST_NODOAVION * listaAux = *lista;
 
-	while(listaAux && strcmp(listaAux->avion.identificador, avion->identificador) != 0){
+	printf("*listaBuscarAvion WW2*\n");
+
+	while(listaAux && (strcmp(listaAux->avion.identificador, avion->identificador) != 0)){
 		listaAux = listaAux->siguiente;
 	}
-
+	printf("*listaBuscarAvion WW3*\n");
 	return listaAux;
 }
 
-void colaCrear(ST_COLA * cola){
-	printf("*colaCrear*\n");
+ST_NODOAVION * listainsertarSinDuplicados(PTR_NODOAVION * lista, ST_AVION * avion){ //inserta al Final de la lista en caso que no este el avion
+	printf("*listaBuscarAvion*\n");
+	printf("*listainsertarSinDuplicados listaBuscarAvion*\n");
+	ST_NODOAVION * nodo = listaBuscarAvion(lista, avion);
 
-	cola->frente = NULL;
-	cola->fin = NULL;
-}
-
-void colaAgregar(ST_COLA * cola, ST_AVION * avion){
-	printf("*colaAgregar*\n");
-
-	ST_NODOAVION * nodoAvionNuevo = crearNodo(avion);
-
-	if(cola->frente == NULL){
-		cola->frente = nodoAvionNuevo;
-	}else{
-		cola->fin->siguiente = nodoAvionNuevo;
+	if(nodo == NULL){
+		nodo = listaInsertarAlFinal(lista, avion);
 	}
-
-	cola->fin = nodoAvionNuevo;
-}
-
-ST_AVION * colaRemover(ST_COLA * cola){
-	printf("*colaRemover*\n");
-
-	ST_NODOAVION *nodoAux = cola->frente;
-	ST_AVION * avionAux = malloc(sizeof(ST_AVION));
-
-	strcpy(avionAux->identificador, nodoAux->avion.identificador);
-	strcpy(avionAux->modelo, nodoAux->avion.modelo);
-	avionAux->combustibleActual = nodoAux->avion.combustibleActual;
-	avionAux->combustibleMaximo = nodoAux->avion.combustibleMaximo;
-	avionAux->estado = nodoAux->avion.estado;
-
-	cola->frente = nodoAux->siguiente;
-
-	if(cola->frente == NULL){
-		cola->fin = NULL;
-	}
-
-	free(nodoAux);
-
-	return avionAux;
+	return nodo;
 }
 
 void listaCrear(PTR_NODOAVION * lista){
@@ -180,6 +149,7 @@ ST_AVION listaBorrarAvion(PTR_NODOAVION * lista, ST_AVION * avion){
 void registrarAvion(ST_AVION * avion, PTR_NODOAVION * listaAviones, char * msjCliente){
 	printf("*registrarAvion*\n");
 
+	printf("*registrarAvion listaBuscarAvion*\n");
 	ST_NODOAVION * nodo = listaBuscarAvion(listaAviones, avion);
 
 	if(nodo == NULL){
@@ -195,6 +165,8 @@ void ingresarAPista(ST_AVION * avion, PTR_NODOAVION * listaAviones, char * msjCl
 
 	//pthread_mutex_t lock;
 	int opcion = 0;
+
+	printf("*ingresarAPista listaBuscarAvion*\n");
 	ST_NODOAVION * nodo = listaBuscarAvion(listaAviones, avion);
 
 	if(nodo != NULL){
@@ -222,7 +194,7 @@ void ingresarAPista(ST_AVION * avion, PTR_NODOAVION * listaAviones, char * msjCl
 
 void consultarEstadoAvion(ST_AVION * avion, PTR_NODOAVION * listaAviones, char * msjCliente){
 	printf("*consultarEstadoAvion*\n");
-
+	printf("*consultarEstadoAvion listaBuscarAvion*\n");
 	ST_NODOAVION * nodo = listaBuscarAvion(listaAviones, avion);
 
 	if(nodo == NULL){
@@ -235,10 +207,11 @@ void consultarEstadoAvion(ST_AVION * avion, PTR_NODOAVION * listaAviones, char *
 void * gastarCombustible(PTR_NODOAVION * listaAviones){
 	printf("*hilo gastarCombustible*\n");
 
-	//pthread_mutex_t lock;
+	pthread_mutex_t lock;
 	PTR_NODOAVION listaAux = NULL;
 
 	while(TRUE){
+		pthread_mutex_lock(&lock);
 		listaAux = *listaAviones;
 
 		while(listaAux != NULL){
@@ -249,6 +222,9 @@ void * gastarCombustible(PTR_NODOAVION * listaAviones){
 
 			if(listaAux->avion.estado == AVION_HANGAR && listaAux->avion.combustibleActual < listaAux->avion.combustibleMaximo){
 				listaAux->avion.combustibleActual += 1000; // Carga 1000 de combustible cuando esta en HANGAR
+				if(listaAux->avion.combustibleActual > listaAux->avion.combustibleMaximo){
+					listaAux->avion.combustibleActual = listaAux->avion.combustibleMaximo;
+				}
 			}
 
 			if(listaAux->avion.estado == AVION_EN_VUELO){
@@ -259,193 +235,228 @@ void * gastarCombustible(PTR_NODOAVION * listaAviones){
 					printf("\tCombustible actual: %d", listaAux->avion.combustibleActual);
 					printf("Tiene poco combustible, se lo coloca en listaAterrizaje");
 
-					//pthread_mutex_lock(&lock);
-
 					listaAux->avion.estado = AVION_ESPERA_ATERRIZAR; //Se coloca en AVION_ESPERA_ATERRIZAR ya que la funcion manejarEstados lo coloca en la lista
-
-					//pthread_mutex_unlock(&lock);
-
 				}
 			}
 
 			listaAux = listaAux->siguiente;
 		}
-
+		pthread_mutex_unlock(&lock);
 		sleep(1);
 	}
 
 	return NULL;
 }
 
-void * manejarEstados(ST_PTRLISTASCOLAS * ptrlistascolas){
+void * manejarEstados(ST_PTRLISTAS * ptrListas){
 	printf("*hilo manejarEstados*\n");
 
-	//pthread_mutex_t lock;
+	pthread_mutex_t lock;
 	int opcion = 0;
-	PTR_NODOAVION listaAvinoesAux = NULL;
-	PTR_NODOAVION listaAterrizajeAux = NULL;
-	ST_COLA colaDespegueAux;
+	PTR_NODOAVION listaAvionesAux = NULL;
+	ST_NODOAVION * avionNodo = NULL;
 
 	while(TRUE){
-		listaAvinoesAux = ptrlistascolas->ptrListaAviones;
-		listaAterrizajeAux = ptrlistascolas->ptrListaAterrizaje;
-		colaDespegueAux.frente = ptrlistascolas->ptrColaDespegueFrente;
-		colaDespegueAux.fin = ptrlistascolas->ptrColaDespegueFin;
+		pthread_mutex_lock(&lock);
+		listaAvionesAux = *ptrListas->ptrListaAviones;
 
-		while(listaAvinoesAux != NULL){
-			opcion = listaAvinoesAux->avion.estado;
+		while(listaAvionesAux != NULL){ // revisa todos los aviones
+			opcion = listaAvionesAux->avion.estado;
 			switch(opcion){
-			case AVION_HANGAR://chequea que tenga combustible completo para pasarlo a AVION_LISTO_HANGAR
-				if(listaAvinoesAux->avion.combustibleActual == listaAvinoesAux->avion.combustibleMaximo){
-					//pthread_mutex_lock(&lock);
-					listaAvinoesAux->avion.estado = AVION_LISTO_HANGAR;
-					//pthread_mutex_unlock(&lock);
+			case AVION_HANGAR: //chequea que tenga combustible completo para pasarlo a AVION_LISTO_HANGAR
+				if(listaAvionesAux->avion.combustibleActual == listaAvionesAux->avion.combustibleMaximo){
+					listaAvionesAux->avion.estado = AVION_LISTO_HANGAR;
 				}
 				break;
 			case AVION_LISTO_DESPEGAR://coloca el avion en ColaDespegue
-				//pthread_mutex_lock(&lock);
-				colaAgregar(&colaDespegueAux, &listaAvinoesAux->avion);
-				//pthread_mutex_unlock(&lock);
+				printf("*manejarEstados listaBuscarAvion AVION_LISTO_DESPEGAR*\n");
+				avionNodo = listaBuscarAvion(ptrListas->ptrListaDespegue, &listaAvionesAux->avion);
+
+				if(avionNodo == NULL){
+					listaInsertarAlFinal(ptrListas->ptrListaDespegue, &listaAvionesAux->avion);
+				}
 				break;
-			case AVION_ESPERA_ATERRIZAR:
-				//coloca el avion en listaAterrizaje
-				//pthread_mutex_lock(&lock);
-				listaInsertarAlFinal(&listaAterrizajeAux, &listaAvinoesAux->avion);
-				//pthread_mutex_unlock(&lock);
+			case AVION_ESPERA_ATERRIZAR: //coloca el avion en listaAterrizaje
+				printf("*manejarEstados listaBuscarAvion AVION_ESPERA_ATERRIZAR*\n");
+				avionNodo = listaBuscarAvion(ptrListas->ptrListaAterrizaje, &listaAvionesAux->avion);
+
+				if(avionNodo == NULL){
+					listaInsertarAlFinal(ptrListas->ptrListaAterrizaje, &listaAvionesAux->avion);
+				}
 				break;
 			default:
 				break;
 			}
 
-			listaAvinoesAux = listaAvinoesAux->siguiente;
+			listaAvionesAux = listaAvionesAux->siguiente;
 		}
-
+		pthread_mutex_unlock(&lock);
 		sleep(1);
 	}
 
 	return NULL;
 }
 
-void * administrarPista(ST_PTRLISTASCOLAS * ptrlistascolas){
+void * administrarPista(ST_PTRLISTAS * ptrListas){
 	printf("*hilo administrarPista*\n");
 
-
-	// revisa 1ero la lista de aterrizaje en busca el avion que tenga estado mas critico
-
-	//			case AVION_DESPEGANDO:
-	//					//levanta flag para que no puedan usar la pista???
-	//				break;
-	//			case AVION_ATERRIZANDO:
-	//					//levanta flag para que no puedan usar la pista???
-	//				break;
-	//funcion que habilita a solo 1 avion a que utilice la pista
-	//levanta flag para que no puedan usar la pista???
-	return NULL;
-}
-
-void gastarcombustiblePRUEBA(PTR_NODOAVION * listaAviones){
-	printf("*gastarcombustiblePRUEBA*\n");
-
-	ST_NODOAVION * listaAux = *listaAviones;
-
-
-	while(listaAux != NULL){
-		if(listaAux->avion.estado == AVION_DESPEGANDO || listaAux->avion.estado == AVION_EN_VUELO ||
-				listaAux->avion.estado == AVION_ESPERA_ATERRIZAR || listaAux->avion.estado == AVION_ATERRIZANDO){
-			listaAux->avion.combustibleActual -= 100; // Gasta 100 de combustible de cada avion
-		}
-
-		if(listaAux->avion.estado == AVION_HANGAR && listaAux->avion.combustibleActual < listaAux->avion.combustibleMaximo){
-			listaAux->avion.combustibleActual += 1000; // Carga 1000 de combustible cuando esta en HANGAR
-			if(listaAux->avion.combustibleActual > listaAux->avion.combustibleMaximo){
-				listaAux->avion.combustibleActual = listaAux->avion.combustibleMaximo;
-			}
-		}
-
-		if(listaAux->avion.estado == AVION_EN_VUELO && listaAux->avion.combustibleActual < COMBUSTIBLE_ESTADO_CRITICO){ // Comprueba que el combustible del avion no este en estado Critico
-			printf("El avion:\n");
-			printf("\tIdentificador: %s", listaAux->avion.identificador);
-			printf("\tModelo: %s", listaAux->avion.modelo);
-			printf("\tCombustible actual: %d", listaAux->avion.combustibleActual);
-			printf("Tiene poco combustible, se lo coloca en listaAterrizaje");
-
-			listaAux->avion.estado = AVION_ESPERA_ATERRIZAR; //Se coloca en AVION_ESPERA_ATERRIZAR ya que la funcion manejarEstados lo coloca en la lista
-		}
-		listaAux = listaAux->siguiente;
-	}
-}
-
-void manejarEstadosPRUEBA(PTR_NODOAVION * listaAviones, PTR_NODOAVION * listaAterrizaje, ST_COLA * colaDespegue){
-	printf("*manejarEstadosPRUEBA*\n");
-
-	int opcion = -1;
-	PTR_NODOAVION listaAvionesAux = *listaAviones;
-//	PTR_NODOAVION listaAterrizajeAux = *listaAterrizaje;
-
-	while(listaAvionesAux != NULL){
-		opcion = listaAvionesAux->avion.estado;
-		switch(opcion){
-		case AVION_HANGAR://chequea que tenga combustible completo para pasarlo a AVION_LISTO_HANGAR
-			if(listaAvionesAux->avion.combustibleActual == listaAvionesAux->avion.combustibleMaximo){
-				listaAvionesAux->avion.estado = AVION_LISTO_HANGAR;
-			}
-			break;
-		case AVION_LISTO_DESPEGAR://coloca el avion en ColaDespegue
-			colaAgregar(colaDespegue, &(listaAvionesAux->avion));
-			break;
-		case AVION_ESPERA_ATERRIZAR:
-			//coloca el avion en listaAterrizaje
-			listaInsertarAlFinal(listaAterrizaje, &(listaAvionesAux->avion));
-			break;
-		default:
-			break;
-		}
-
-		listaAvionesAux = listaAvionesAux->siguiente;
-		opcion = -1;
-	}
-}
-
-void administrarPistaPRUEBA(PTR_NODOAVION * listaAviones, PTR_NODOAVION * listaAterrizaje, ST_COLA * colaDespegue){
-	printf("*administrarPistaPRUEBA*\n");
-
-//	int estadoCritico = FALSE;
-	PTR_NODOAVION listaAterrizajeAux = *listaAterrizaje;
+	pthread_mutex_t lock;
+	PTR_NODOAVION listaAterrizajeAux = NULL;
+	PTR_NODOAVION listaDespegueAux = NULL;
 	ST_NODOAVION * avionNodo = NULL;
 	ST_NODOAVION * avionCritico = NULL;
 	ST_NODOAVION * avionCriticoMenor = NULL;
-	ST_AVION * avion;
+	ST_AVION avion;
 
-	if(listaAterrizajeAux != NULL){
-		avionCritico = listaAterrizajeAux;
-		avionCriticoMenor = listaAterrizajeAux;
-	}
+	while(TRUE){
+		pthread_mutex_lock(&lock);
+		avionNodo = NULL;
+		avionCritico = NULL;
+		avionCriticoMenor = NULL;
+		listaAterrizajeAux = *ptrListas->ptrListaAterrizaje;
+		listaDespegueAux = *ptrListas->ptrListaDespegue;
 
-	while(listaAterrizajeAux != NULL){
-		if(listaAterrizajeAux->avion.combustibleActual < COMBUSTIBLE_ESTADO_CRITICO){
+		if(listaAterrizajeAux != NULL){
 			avionCritico = listaAterrizajeAux;
-			if(avionCritico->avion.combustibleActual < avionCriticoMenor->avion.combustibleActual){
-				avionCriticoMenor->avion.combustibleActual = avionCritico->avion.combustibleActual;
-//				estadoCritico = TRUE;
+			avionCriticoMenor = listaAterrizajeAux;
+		}
+
+		while(listaAterrizajeAux != NULL){ //Busca si hay aviones en ESPERA / ATERRIZAR
+			if((listaAterrizajeAux)->avion.combustibleActual < COMBUSTIBLE_ESTADO_CRITICO){
+				avionCritico = listaAterrizajeAux;
+				if(avionCritico->avion.combustibleActual < avionCriticoMenor->avion.combustibleActual){
+					avionCriticoMenor->avion.combustibleActual = avionCritico->avion.combustibleActual;
+				}
+			}
+
+			listaAterrizajeAux = listaAterrizajeAux->siguiente;
+		}
+
+		if(avionCriticoMenor != NULL){ //salen aviones de listaAterrizaje
+			printf("*administrarPista listaBuscarAvion LISTA ATERRIZAJE*\n");
+			avionNodo = listaBuscarAvion(ptrListas->ptrListaAviones, &(avionCriticoMenor->avion));
+			avionNodo->avion.estado = AVION_ATERRIZANDO;
+			sleep(5);
+			avionNodo->avion.estado =AVION_HANGAR;
+			listaBorrarAvion(ptrListas->ptrListaAterrizaje, &(avionCriticoMenor->avion));
+		}else{
+			if(listaDespegueAux != NULL){ //salen aviones de colaDespegar
+				avion = listaBorrarPrimero(ptrListas->ptrListaDespegue);
+				printf("*administrarPista listaBuscarAvion LISTA DESPEGUE*\n");
+				avionNodo = listaBuscarAvion(ptrListas->ptrListaAviones, &avion);
+				avionNodo->avion.estado = AVION_DESPEGANDO;
+				sleep(5);
+				avionNodo->avion.estado = AVION_EN_VUELO;
 			}
 		}
-
-		listaAterrizajeAux = listaAterrizajeAux->siguiente;
+		pthread_mutex_unlock(&lock);
+		sleep(1);
 	}
 
-	if(avionCriticoMenor == NULL){ //salen aviones de colaDespegar
-		if(colaDespegue->frente != NULL){
-			avion = colaRemover(colaDespegue);
-			avionNodo = listaBuscarAvion(listaAviones, avion);
-			avionNodo->avion.estado = AVION_DESPEGANDO;
-			sleep(5);
-			avionNodo->avion.estado =AVION_EN_VUELO;
-		}
-	}else{ //salen aviones de listaAterrizaje
-		avionNodo = listaBuscarAvion(listaAviones, &(avionCriticoMenor->avion));
-		listaBorrarAvion(listaAterrizaje, &(avionCriticoMenor->avion));
-		avionNodo->avion.estado = AVION_ATERRIZANDO;
-		sleep(5);
-		avionNodo->avion.estado =AVION_HANGAR;
-	}
+	return NULL;
 }
+
+//void gastarcombustiblePRUEBA(PTR_NODOAVION * listaAviones){
+//	printf("*gastarcombustiblePRUEBA*\n");
+//
+//	ST_NODOAVION * listaAux = *listaAviones;
+//
+//
+//	while(listaAux != NULL){
+//		if(listaAux->avion.estado == AVION_DESPEGANDO || listaAux->avion.estado == AVION_EN_VUELO ||
+//				listaAux->avion.estado == AVION_ESPERA_ATERRIZAR || listaAux->avion.estado == AVION_ATERRIZANDO){
+//			listaAux->avion.combustibleActual -= 100; // Gasta 100 de combustible de cada avion
+//		}
+//
+//		if(listaAux->avion.estado == AVION_HANGAR && listaAux->avion.combustibleActual < listaAux->avion.combustibleMaximo){
+//			listaAux->avion.combustibleActual += 1000; // Carga 1000 de combustible cuando esta en HANGAR
+//			if(listaAux->avion.combustibleActual > listaAux->avion.combustibleMaximo){
+//				listaAux->avion.combustibleActual = listaAux->avion.combustibleMaximo;
+//			}
+//		}
+//
+//		if(listaAux->avion.estado == AVION_EN_VUELO && listaAux->avion.combustibleActual < COMBUSTIBLE_ESTADO_CRITICO){ // Comprueba que el combustible del avion no este en estado Critico
+//			printf("El avion:\n");
+//			printf("\tIdentificador: %s", listaAux->avion.identificador);
+//			printf("\tModelo: %s", listaAux->avion.modelo);
+//			printf("\tCombustible actual: %d", listaAux->avion.combustibleActual);
+//			printf("Tiene poco combustible, se lo coloca en listaAterrizaje");
+//
+//			listaAux->avion.estado = AVION_ESPERA_ATERRIZAR; //Se coloca en AVION_ESPERA_ATERRIZAR ya que la funcion manejarEstados lo coloca en la lista
+//		}
+//		listaAux = listaAux->siguiente;
+//	}
+//}
+//
+//void manejarEstadosPRUEBA(PTR_NODOAVION * listaAviones, PTR_NODOAVION * listaAterrizaje, PTR_NODOAVION * listaDespegue){
+//	printf("*manejarEstadosPRUEBA*\n");
+//
+//	int opcion = -1;
+//	PTR_NODOAVION listaAvionesAux = *listaAviones;
+////	PTR_NODOAVION listaAterrizajeAux = *listaAterrizaje;
+//
+//	while(listaAvionesAux != NULL){
+//		opcion = listaAvionesAux->avion.estado;
+//		switch(opcion){
+//		case AVION_HANGAR://chequea que tenga combustible completo para pasarlo a AVION_LISTO_HANGAR
+//			if(listaAvionesAux->avion.combustibleActual == listaAvionesAux->avion.combustibleMaximo){
+//				listaAvionesAux->avion.estado = AVION_LISTO_HANGAR;
+//			}
+//			break;
+//		case AVION_LISTO_DESPEGAR://coloca el avion en ColaDespegue
+//			listaInsertarAlFinal(listaDespegue, &(listaAvionesAux->avion));
+//			break;
+//		case AVION_ESPERA_ATERRIZAR:
+//			//coloca el avion en listaAterrizaje
+//			listaInsertarAlFinal(listaAterrizaje, &(listaAvionesAux->avion));
+//			break;
+//		default:
+//			break;
+//		}
+//
+//		listaAvionesAux = listaAvionesAux->siguiente;
+//		opcion = -1;
+//	}
+//}
+//
+//void administrarPistaPRUEBA(PTR_NODOAVION * listaAviones, PTR_NODOAVION * listaAterrizaje, PTR_NODOAVION * listaDespegue){
+//	printf("*administrarPistaPRUEBA*\n");
+//
+//	PTR_NODOAVION listaAterrizajeAux = *listaAterrizaje;
+//	ST_NODOAVION * avionNodo = NULL;
+//	ST_NODOAVION * avionCritico = NULL;
+//	ST_NODOAVION * avionCriticoMenor = NULL;
+//	ST_AVION * avion;
+//
+//	if(listaAterrizajeAux != NULL){
+//		avionCritico = listaAterrizajeAux;
+//		avionCriticoMenor = listaAterrizajeAux;
+//	}
+//
+//	while(listaAterrizajeAux != NULL){
+//		if(listaAterrizajeAux->avion.combustibleActual < COMBUSTIBLE_ESTADO_CRITICO){
+//			avionCritico = listaAterrizajeAux;
+//			if(avionCritico->avion.combustibleActual < avionCriticoMenor->avion.combustibleActual){
+//				avionCriticoMenor->avion.combustibleActual = avionCritico->avion.combustibleActual;
+//			}
+//		}
+//
+//		listaAterrizajeAux = listaAterrizajeAux->siguiente;
+//	}
+//
+//	if(avionCriticoMenor != NULL){ //salen aviones de listaDespegar
+//		avionNodo = listaBuscarAvion(listaAviones, &(avionCriticoMenor->avion));
+//		listaBorrarAvion(listaAterrizaje, &(avionCriticoMenor->avion));
+//		avionNodo->avion.estado = AVION_ATERRIZANDO;
+//		sleep(5);
+//		avionNodo->avion.estado =AVION_HANGAR;
+//	}else{ //salen aviones de listaAterrizaje
+//		if(listaDespegue != NULL){
+//			*avion = listaBorrarPrimero(listaDespegue);
+//			avionNodo = listaBuscarAvion(listaAviones, avion);
+//			avionNodo->avion.estado = AVION_DESPEGANDO;
+//			sleep(5);
+//			avionNodo->avion.estado =AVION_EN_VUELO;
+//		}
+//	}
+//}
