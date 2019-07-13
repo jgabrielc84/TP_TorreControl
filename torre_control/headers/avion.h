@@ -42,16 +42,11 @@ typedef struct nodo{
 	struct nodo *siguiente;
 }ST_NODOAVION, *PTR_NODOAVION;
 
-//typedef struct{
-//	ST_NODOAVION * frente;
-//	ST_NODOAVION * fin;
-//}ST_COLA, *PTR_COLA;
-
 typedef struct{
 	PTR_NODOAVION * ptrListaAviones;
 	PTR_NODOAVION * ptrListaAterrizaje;
 	PTR_NODOAVION * ptrListaDespegue;
-}ST_PTRLISTAS;//,*PTR_PTRLISTASCOLAS;
+}ST_PTRLISTAS;
 
 
 void inicializarAvion(ST_AVION *);
@@ -67,12 +62,6 @@ void * gastarCombustible(PTR_NODOAVION *);
 void * manejarEstados(ST_PTRLISTAS *);
 
 void * administrarPista(ST_PTRLISTAS *);
-
-//void gastarcombustiblePRUEBA(PTR_NODOAVION *);
-//
-//void manejarEstadosPRUEBA(PTR_NODOAVION *, PTR_NODOAVION *, PTR_NODOAVION *);
-//
-//void administrarPistaPRUEBA(PTR_NODOAVION *, PTR_NODOAVION *, PTR_NODOAVION *);
 
 void listaCrear(PTR_NODOAVION *);
 

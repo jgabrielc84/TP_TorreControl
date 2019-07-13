@@ -46,9 +46,6 @@ int main() {
 	int socketNuevo = 0;
 	int posVacia = FALSE;
 	int hayActividad = 0;
-//	struct timeval timeout;
-//	timeout.tv_sec = 1; //Se setea la cuenta regresiva para usar en el select()
-//	timeout.tv_usec = 0;
 	PTR_NODOAVION listaAviones;
 	PTR_NODOAVION listaAterrizaje;
 	PTR_NODOAVION listaDespegue;
@@ -64,9 +61,11 @@ int main() {
 	listaCrear(&listaAviones);
 	listaCrear(&listaAterrizaje);
 	listaCrear(&listaDespegue);
+	ptrListasColas.ptrListaAviones = &listaAviones;
+	ptrListasColas.ptrListaAterrizaje = &listaAterrizaje;
+	ptrListasColas.ptrListaDespegue = &listaDespegue;
 
-	/*Inicializa los socketCliente en 0*/
-	for (i = 0; i < CANT_MAX_CLIE; i++){
+	for (i = 0; i < CANT_MAX_CLIE; i++){ //Inicializa los socketCliente en 0
 		socketCliente[i] = 0;
 	}
 
@@ -92,28 +91,21 @@ int main() {
 		exit(EXIT_FAILURE);
 	}
 
-	/*Crea hilo que ejecuta gastarCombustible*/
-	if(pthread_create(&hiloGastarCombustible, NULL, (void *) gastarCombustible, &listaAviones)) {
+	if(pthread_create(&hiloGastarCombustible, NULL, (void *) gastarCombustible, &listaAviones)){ //Crea hilo que ejecuta gastarCombustible
 		printf("Error al crear el hilo.\n");
 		exit(EXIT_FAILURE);
 	}
 
 	sleep(1);
 
-	ptrListasColas.ptrListaAviones = &listaAviones;
-	ptrListasColas.ptrListaAterrizaje = &listaAterrizaje;
-	ptrListasColas.ptrListaDespegue = &listaDespegue;
-
-	/*Crea hilo que ejecuta manejarEstados*/
-	if(pthread_create(&hiloManejarEstados, NULL, (void *) manejarEstados, &ptrListasColas)) {
+	if(pthread_create(&hiloManejarEstados, NULL, (void *) manejarEstados, &ptrListasColas)){ //Crea hilo que ejecuta manejarEstados
 		printf("Error al crear el hilo.\n");
 		exit(EXIT_FAILURE);
 	}
 
 	sleep(1);
 
-	/*Crea hilo que ejecuta administrarPista*/
-	if(pthread_create(&hiloAdministrarPista, NULL, (void *) administrarPista, &ptrListasColas)) {
+	if(pthread_create(&hiloAdministrarPista, NULL, (void *) administrarPista, &ptrListasColas)){ //Crea hilo que ejecuta administrarPista
 		printf("Error al crear el hilo.\n");
 		exit(EXIT_FAILURE);
 	}
@@ -121,8 +113,6 @@ int main() {
 	sleep(1);
 
 	while(TRUE){
-//		resolverSelect();
-
 		FD_ZERO (&descriptorLectura);
 		FD_SET (socketServidor, &descriptorLectura);
 
@@ -137,41 +127,32 @@ int main() {
 		if (hayActividad < 0){
 			printf("Error en select.\n");
 		}
-		printf("WaitWindows 1\n");
+
 		for (i = 0; i<CANT_MAX_CLIE; i++){
-			printf("WaitWindows 2.%d\n", i);
+
 			if (FD_ISSET (socketCliente[i], &descriptorLectura)){
-				printf("WaitWindows 3.%d\n", i);
 
 				if((bytesRecibidos = recibirMensaje(&(socketCliente[i]), msjCliente)) > 0){
 					// Se ha leido un dato del cliente correctamente. Hacer aquí el tratamiento para ese mensaje. En el ejemplo, se lee y se escribe en pantalla.
-					printf("WaitWindows 4.%d\n", i);
 
-					printf("Mensaje recibido: %s\n", msjCliente); // BORRAR
 					parsearMensaje(avion, &opcion, msjCliente);
 
-					printf("Id: %s\n", avion->identificador); // BORRAR
-					printf("Modelo: %s\n", avion->modelo); // BORRAR
-					printf("CombustibleActual: %d\n", avion->combustibleActual); // BORRAR
-					printf("CombustibleMaximo: %d\n", avion->combustibleMaximo); // BORRAR
-					printf("Estado: %d\n", avion->estado); // BORRAR
-					printf("Opcion: %d\n", opcion); // BORRAR
-
 					resolverPedidoCliente(&opcion, avion, msjCliente, &socketCliente[i], &listaAviones);
-				}else{
-					// Hay un error en la lectura. Posiblemente el cliente ha cerrado la conexión. Hacer aquí el tratamiento. En el ejemplo, se cierra el socket y se elimina del array de socketCliente[]
+				}else{ // Hay un error en la lectura (el cliente ha cerrado la conexión o hay error al recibir el mensaje)
+					if(bytesRecibidos == 0){
+						printf ("Socket cerrado.\n");
 
-					printf("Mensaje no recibido \n\tbytesRecibidos: %d \n", bytesRecibidos);
+						socketCliente[i] = 0;
+					}else{
+						printf ("Error al recibir mensaje.\n");
+					}
 				}//FIN if
 			}//FIN if
 		}//FIN for
 
-		// Se trata el socket servidor
-		printf("*Revisa socketServidor*\n");
-		if (FD_ISSET (socketServidor, &descriptorLectura)){
-			// Un nuevo cliente solicita conexión. Aceptarla aquí. En el ejemplo, se acepta la conexión, se mete el descriptor en socketCliente[] y se envía al cliente su posición en el array como número de cliente.
+		printf("*Revisa socketServidor*\n"); // Se trata el socket servidor
+		if (FD_ISSET (socketServidor, &descriptorLectura)){ // Un nuevo cliente solicita conexión, se mete el descriptor en socketCliente[]
 			socketNuevo = accept(socketServidor, (void *) &direccionCliente, &tamanioDireccionCliente);
-			//numeroClientes++;
 
 			i = 0;
 			posVacia = FALSE;
@@ -186,23 +167,21 @@ int main() {
 
 			if(i < CANT_MAX_CLIE && posVacia == TRUE){ //Controla que se haya guardado el socketNuevo
 				printf("Recibi una conexion en el cliente numero: %d  tamanioDireccion: %d !!\n\n", socketCliente[i], tamanioDireccionCliente);
-//				if((bytesRecibidos = recibirMensaje(&(socketCliente[i]), msjCliente)) > 0){
-//					// Se ha leido un dato del cliente correctamente. Hacer aquí el tratamiento para ese mensaje. En el ejemplo, se lee y se escribe en pantalla.
-//					parsearMensaje(avion, &opcion, msjCliente);
-//
-//					printf("Id: %s\n", avion->identificador); // BORRAR
-//					printf("Modelo: %s\n", avion->modelo); // BORRAR
-//					printf("combAct: %d\n", avion->combustibleActual); // BORRAR
-//					printf("combMax: %d\n", avion->combustibleMaximo); // BORRAR
-//					printf("estado: %d\n", avion->estado); // BORRAR
-//					printf("Opcion: %d\n", opcion); // BORRAR
-//
-//					resolverPedidoCliente(&opcion, avion, msjCliente, &socketCliente[i], &listaAviones);
-//				}else{
-//					// Hay un error en la lectura. Posiblemente el cliente ha cerrado la conexión. Hacer aquí el tratamiento. En el ejemplo, se cierra el socket y se elimina del array de socketCliente[]
-//
-//					printf("Mensaje no recibido \n\tbytesRecibidos: %d \n", bytesRecibidos);
-//				}//FIN if
+				if((bytesRecibidos = recibirMensaje(&(socketCliente[i]), msjCliente)) > 0){
+					// Se ha leido un dato del cliente correctamente. Hacer aquí el tratamiento para ese mensaje. En el ejemplo, se lee y se escribe en pantalla.
+
+					parsearMensaje(avion, &opcion, msjCliente);
+
+					resolverPedidoCliente(&opcion, avion, msjCliente, &socketCliente[i], &listaAviones);
+				}else{ // Hay un error en la lectura (el cliente ha cerrado la conexión o hay error al recibir el mensaje)
+					if(bytesRecibidos == 0){
+						printf ("Socket cerrado.\n");
+
+						socketCliente[i] = 0;
+					}else{
+						printf ("Error al recibir mensaje.\n");
+					}
+				}//FIN if
 			}else{
 				printf("Lista de sockets Cliente llena.\n");
 			}//FIN if
